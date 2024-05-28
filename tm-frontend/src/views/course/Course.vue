@@ -3,6 +3,7 @@ import {fetchCourseAPI, selectCourseAPI, fetchCurrentSelectionAPI, reportLearnAP
 import { ref, reactive, onMounted, computed } from 'vue'
 import router from '../../router'
 import { useLoginStore } from "../../store";
+import { ElMessage } from 'element-plus';
 document.title = "学习"
 const loginstate = useLoginStore();
 const tableData:any = reactive([])
@@ -38,21 +39,21 @@ const report = async (row:any) => {
   if (reported_hour != null){
     if (isFloat(reported_hour)){
       if (Number(reported_hour)>5){
-        alert("申报得多了点儿，少报点儿吧！")
+        ElMessage("申报得多了点儿，少报点儿吧！")
         return false
       }
       let data = {chapter_id:row.chapter_id,course_id:row.course_id,chapter_title:row.chapter_title,sele_id:row.sele_id,reported_hour:reported_hour}
       let res = await reportLearnAPI(data)
       console.log(res)
       if(res){
-        alert("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
+        ElMessage.success("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
         currentTableData.length=0
         getCurrentSelection()
       } else {
-        alert("出错了，请重试一次...")
+        ElMessage.error("出错了，请重试一次...")
       }
     } else {
-      alert("请输入整数或小数")
+      ElMessage.error("请输入整数或小数")
     }
   }
   
@@ -71,7 +72,7 @@ const selection = async (title:string,id:number) => {
 
 // 补充selection函数
 const deselection = async () => {
-  alert("不要轻言放弃，请找您的塾师咨询。")
+  ElMessage.warning("不要轻言放弃，请找您的塾师咨询。")
 }
 
 

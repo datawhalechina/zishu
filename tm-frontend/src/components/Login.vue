@@ -7,11 +7,45 @@
   </span>
   
   <span v-else>
-    <el-link type="primary" href="/user" target="_blank">{{ loginstate.name }}</el-link>
+    <el-dropdown>
+    <el-button text>
+      {{ loginstate.name }}
+    </el-button>
+    <template #dropdown>
+      <el-dropdown-menu>
+        <el-row>
+      <el-link v-if="loginstate.id==1" type="primary" href="/user/registers" target="_blank">注册列表</el-link>
+    </el-row>
+    <el-row>
+      <el-link type="primary" href="/user/changepass" target="_blank">修改密码</el-link>
+    </el-row>
+    <el-row>
+      <div v-if="loginstate.id==1"><el-link type="primary" href="/user/resetpass" target="_blank">重置密码</el-link></div>
+    </el-row>
+    <el-link type="primary" href="/user/editprofile" target="_blank">编辑个人信息</el-link>
+    <br />
+    <el-link type="primary" :href="'/user/profile/'+userid" target="_blank">展示个人信息</el-link>
+    <br />
+    <el-link type="primary" href="/user/all" target="_blank">全塾</el-link>
+    <br />
+    <el-link type="primary" href="/user/report" target="_blank">汇报详单</el-link>
+    <br />
+    <el-link type="primary" href="/user/shuzhi" target="_blank">塾值详单</el-link>
+    <br />
+    <el-link type="primary" href="/user/mentor" target="_blank">选塾师</el-link>
+    <br />
+    <el-link type="primary" href="/user/supervise" target="_blank">学习监督</el-link>
+    <br />
+    <el-link v-if="loginstate.id==1" type="primary" href="/course/add" target="_blank">新增课程</el-link>
+    <br />
+    <el-link type="primary" href="/user/followup" target="_blank">创新结项</el-link>
+      </el-dropdown-menu>
+    </template>
+  </el-dropdown>
     <el-button text @click="logOut">登出</el-button>
   </span>
   
-
+  
   <el-dialog v-model="loginstate.dialogFormVisible" :width="diaglogwidth" :center="true" title="登录">
     <el-form :model="form">
       <el-form-item label="手机号" :label-width="formLabelWidth">
@@ -67,12 +101,11 @@ import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-
 const registerFormVisible = ref(false)
 const formLabelWidth = '70px'
 const diaglogwidth = '370px'
 const loginstate = useLoginStore();
-
+const userid = loginstate.id
 const form = reactive({
   phone: '',
   password: '',
