@@ -68,10 +68,10 @@ const delete_user = async ()=> {
   style="width: 100%"
   @current-change="handleCurrentChange"
   >
-    <el-table-column prop="name" label="Name" width="180" />
-    <el-table-column prop="email" label="Email" />
-    <el-table-column prop="phone" label="Phone" />
-    <el-table-column prop="register_time" label="Time" />
+    <el-table-column prop="name" label="姓名" width="180" />
+    <el-table-column prop="email" label="邮箱" />
+    <el-table-column prop="phone" label="手机号" />
+    <el-table-column prop="register_time" label="注册时间" />
   </el-table>
 </template>
 

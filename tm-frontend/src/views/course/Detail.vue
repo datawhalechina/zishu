@@ -77,13 +77,13 @@ function getDeadlineColor(deadline: string) {
   style="width: 100%"
   >
     <el-table-column label="章节序号" type="index" width="100" />
-    <el-table-column label="章节名称">
+    <el-table-column label="章节名称" sortable >
       <template #default="scope">
         <el-link type="primary" :href="scope.row.url" target="_blank">{{ scope.row.title }}</el-link>
       </template>
     </el-table-column>
-    <el-table-column prop="author_name" label="作者" />
-    <el-table-column prop="period" label="学习周期" />
+    <el-table-column prop="author_name" label="作者" sortable  />
+    <el-table-column prop="period" label="学习周期" sortable  />
   </el-table>
   <h3>当前同塾</h3>
   <el-table 

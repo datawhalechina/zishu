@@ -66,6 +66,7 @@ import { useLoginStore } from "../store";
 import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 const registerFormVisible = ref(false)
 const formLabelWidth = '70px'
@@ -145,7 +146,7 @@ const checklogin = async() => {
       form.password = ""
       window.location.reload();
     } else {
-      alert("用户名或密码错误,请重新输入")
+      ElMessage.error('用户名或密码错误,请重新输入')
     }
     
     
@@ -168,12 +169,12 @@ const forgetPass = async () => {
     let data = {phone: form.phone, password: "unkown"}
     res = await resetPassAPI(data)
   } else {
-    alert("请输入正确的手机号！")
+    ElMessage.error("请输入正确的手机号！")
     return false;
   }
   
   if (res && res.code == '200'){
-    alert("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
+    ElMessage.success("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
     loginstate.dialogFormVisible = false
     form.phone = ""
     form.password = ""
@@ -188,7 +189,7 @@ const register = async (formEl: FormInstance | undefined) => {
       console.log(formRegi)
       doRegister()
     } else {
-      alert('请完善注册信息!')
+      ElMessage.error('请完善注册信息!')
     }
   })
 }
@@ -202,7 +203,7 @@ const doRegister = async() => {
   }
   let res = await RegisterAPI(data)
   if (res.code == 200){
-    alert("注册成功，请等待至多三天审核！")
+    ElMessage.success("注册成功，请等待至多三天审核！")
     formRegi.name = ''
     formRegi.password = ''
     formRegi.checkpass = ''
@@ -210,7 +211,7 @@ const doRegister = async() => {
     formRegi.phone = ''
     registerFormVisible.value = false
   } else {
-    alert("注册失败")
+    ElMessage.error("注册失败")
   }
 }
 
