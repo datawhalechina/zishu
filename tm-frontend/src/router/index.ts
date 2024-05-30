@@ -10,31 +10,31 @@ const routes: Array<RouteRecordRaw> = [
     children: [
         {
             path: "/",
-            // 命名
+            // 首页
             name: "Home",
             component: () => import("../views/Home.vue"),
         },
         {
             path: "/learn",
-            // 命名
+            // 课程首页
             name: "Course",
             component: () => import("../views/course/Course.vue"),
         },
         {
           path: "/course/add",
-          // 命名
+          // 添加课程
           name: "Addcourse",
           component: () => import("../views/course/Add.vue"),
         },
         {
           path: "/course/:id",
-          // 命名
+          // 课程详情
           name: "Coursedetail",
           component: () => import("../views/course/Detail.vue"),
         },
         {
           path: "/course/edit/:id",
-          // 命名
+          // 编辑课程信息
           name: "Editcourse",
           component: () => import("../views/course/Edit.vue"),
        },
@@ -46,13 +46,13 @@ const routes: Array<RouteRecordRaw> = [
         },
         {
           path: "/user",
-          // 命名
+          // 用户管理
           name: "User",
           component: () => import("../views/user/Center.vue"),
         },
         {
         path: "/user/registers",
-          // 命名
+          // 注册页面
           name: "Register",
           component: () => import("../views/user/Registers.vue"),
         },
