@@ -9,7 +9,7 @@
   <span v-else>
     <el-dropdown>
     <el-button text>
-      {{ loginstate.name }}
+      <el-link type="primary" href="/user" target="_blank">{{ loginstate.name }}</el-link>
     </el-button>
     <template #dropdown>
       <el-dropdown-menu>
