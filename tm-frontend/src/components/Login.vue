@@ -7,11 +7,45 @@
   </span>
   
   <span v-else>
-    <el-link type="primary" href="/user" target="_blank">{{ loginstate.name }}</el-link>
+    <el-dropdown>
+    <el-button text>
+      <el-link type="primary" href="/user" target="_blank">{{ loginstate.name }}</el-link>
+    </el-button>
+    <template #dropdown>
+      <el-dropdown-menu>
+        <el-row>
+      <el-link v-if="loginstate.id==1" type="primary" href="/user/registers" target="_blank">注册列表</el-link>
+    </el-row>
+    <el-row>
+      <el-link type="primary" href="/user/changepass" target="_blank">修改密码</el-link>
+    </el-row>
+    <el-row>
+      <div v-if="loginstate.id==1"><el-link type="primary" href="/user/resetpass" target="_blank">重置密码</el-link></div>
+    </el-row>
+    <el-link type="primary" href="/user/editprofile" target="_blank">编辑个人信息</el-link>
+    <br />
+    <el-link type="primary" :href="'/user/profile/'+userid" target="_blank">展示个人信息</el-link>
+    <br />
+    <el-link type="primary" href="/user/all" target="_blank">全塾</el-link>
+    <br />
+    <el-link type="primary" href="/user/report" target="_blank">汇报详单</el-link>
+    <br />
+    <el-link type="primary" href="/user/shuzhi" target="_blank">塾值详单</el-link>
+    <br />
+    <el-link type="primary" href="/user/mentor" target="_blank">选塾师</el-link>
+    <br />
+    <el-link type="primary" href="/user/supervise" target="_blank">学习监督</el-link>
+    <br />
+    <el-link v-if="loginstate.id==1" type="primary" href="/course/add" target="_blank">新增课程</el-link>
+    <br />
+    <el-link type="primary" href="/user/followup" target="_blank">创新结项</el-link>
+      </el-dropdown-menu>
+    </template>
+  </el-dropdown>
     <el-button text @click="logOut">登出</el-button>
   </span>
   
-
+  
   <el-dialog v-model="loginstate.dialogFormVisible" :width="diaglogwidth" :center="true" title="登录">
     <el-form :model="form">
       <el-form-item label="手机号" :label-width="formLabelWidth">
@@ -66,12 +100,12 @@ import { useLoginStore } from "../store";
 import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
-
+import { ElMessage } from 'element-plus'
 const registerFormVisible = ref(false)
 const formLabelWidth = '70px'
 const diaglogwidth = '370px'
 const loginstate = useLoginStore();
-
+const userid = loginstate.id
 const form = reactive({
   phone: '',
   password: '',
@@ -145,7 +179,7 @@ const checklogin = async() => {
       form.password = ""
       window.location.reload();
     } else {
-      alert("用户名或密码错误,请重新输入")
+      ElMessage.error('用户名或密码错误,请重新输入')
     }
     
     
@@ -168,12 +202,12 @@ const forgetPass = async () => {
     let data = {phone: form.phone, password: "unkown"}
     res = await resetPassAPI(data)
   } else {
-    alert("请输入正确的手机号！")
+    ElMessage.error("请输入正确的手机号！")
     return false;
   }
   
   if (res && res.code == '200'){
-    alert("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
+    ElMessage.success("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
     loginstate.dialogFormVisible = false
     form.phone = ""
     form.password = ""
@@ -188,7 +222,7 @@ const register = async (formEl: FormInstance | undefined) => {
       console.log(formRegi)
       doRegister()
     } else {
-      alert('请完善注册信息!')
+      ElMessage.error('请完善注册信息!')
     }
   })
 }
@@ -202,7 +236,7 @@ const doRegister = async() => {
   }
   let res = await RegisterAPI(data)
   if (res.code == 200){
-    alert("注册成功，请等待至多三天审核！")
+    ElMessage.success("注册成功，请等待至多三天审核！")
     formRegi.name = ''
     formRegi.password = ''
     formRegi.checkpass = ''
@@ -210,7 +244,7 @@ const doRegister = async() => {
     formRegi.phone = ''
     registerFormVisible.value = false
   } else {
-    alert("注册失败")
+    ElMessage.error("注册失败")
   }
 }
 

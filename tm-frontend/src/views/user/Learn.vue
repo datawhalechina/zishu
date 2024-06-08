@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
 import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 const currentTableData:any = reactive([])
 const getCurrentSelection = async () => {
   let res = await fetchCurrentSelectionAPI()
@@ -26,12 +27,12 @@ const report = async (row:any) => {
       let res = await reportLearnAPI(data)
       console.log(res)
       if(res.code==200){
-        alert("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
+        ElMessage.success("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
         currentTableData.length=0
         getCurrentSelection()
       }
     } else {
-      alert("请输入整数或小数")
+      ElMessage.error("请输入整数或小数")
     }
   }
   

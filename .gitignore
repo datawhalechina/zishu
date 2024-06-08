@@ -1,6 +1,7 @@
 tm-frontend/node_modules
 .gitignore
-
+tm-backend/inidb.py
+tm-backend/mydatabase.db
 tm-backend/**/__pycache__
 tm-backend/.venv
 tm-backend/poetry.lock
