@@ -81,6 +81,6 @@ console.log(tuple); // 输出 ["Hello", 42, true, "world"]
 ```typescript
 let tuple: [string, number, boolean] = ["Hello", 42, true];
 let lastElement = tuple.pop();
-console.log(lastElement); // 输出 "world"
-console.log(tuple); // 输出 ["Hello", 42, true]
+console.log(lastElement); // 输出 true
+console.log(tuple); // 输出 ["Hello", 42]
 ```
