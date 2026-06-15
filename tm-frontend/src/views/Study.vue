@@ -287,21 +287,12 @@ const submitReport = async () => {
 }
 
 // 页面离开时自动申报
-const beforeUnload = () => {
-  if (studyTimer.value > 60) {
-    // 实际项目中这里可以发送请求
-    console.log('学习时长:', studyTimer.value)
-  }
-}
-
 onMounted(() => {
   fetchCourse()
-  window.addEventListener('beforeunload', beforeUnload)
 })
 
 onUnmounted(() => {
   stopTimer()
-  window.removeEventListener('beforeunload', beforeUnload)
 })
 
 // 路由变化时重新加载

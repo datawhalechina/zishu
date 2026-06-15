@@ -42,7 +42,7 @@ instance.interceptors.request.use(
         return Promise.reject(error)
     }
 )
- 
+
 // response 拦截器
 instance.interceptors.response.use(
     response => {
@@ -62,10 +62,8 @@ instance.interceptors.response.use(
         // 处理401错误 - token过期
         if (data?.detail?.code === 5000 && config && !config.url?.includes('/refresh')) {
             loginstate.atoken = ''
-            console.log("准备刷新token");
             try {
                 const res = await refreshToken();
-                console.log(res);
                 if (res && res.id > 0) {
                     return instance(config);
                 } else {
