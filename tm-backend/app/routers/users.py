@@ -111,7 +111,7 @@ def send_reset_password_email(email: str, reset_token: str):
         raise HTTPException(
             status_code=500,
             detail=f"发送邮件失败: {str(e)}"
-        )
+        ) from e
 
 def generate_password_reset_token(user_id: int) -> str:
     """
@@ -161,11 +161,11 @@ def reset_password(
                 status_code=400,
                 detail="无效的重置链接"
             )
-    except jwt.JWTError:
+    except jwt.JWTError as e:
         raise HTTPException(
             status_code=400,
             detail="无效的重置链接"
-        )
+        ) from e
         
     user = db.query(Users).filter(Users.id == user_id).first()
     if not user:
@@ -183,7 +183,7 @@ def reset_password(
         raise HTTPException(
             status_code=500,
             detail=f"密码重置失败: {str(e)}"
-        )
+        ) from e
     
     return {"message": "密码重置成功"}
 
@@ -280,7 +280,7 @@ async def register(request: Request, name: str = Form(...), password: str = Form
         raise HTTPException(
             status_code=500,
             detail=f"注册失败: {str(e)}"
-        )
+        ) from e
     return {"code": 200, "message":"OK"}
 
 @router.get("/fetch_registrations", dependencies=[Depends(check_jwt_token)])
@@ -333,7 +333,7 @@ async def handle_registrations(action: str = Form(...), id: int = Form(...), db:
         raise HTTPException(
             status_code=500,
             detail=f"操作失败: {str(e)}"
-        )
+        ) from e
     return {"code": 200, "message":"OK"}
 
 @router.post("/handle_changepass")
@@ -361,7 +361,7 @@ async def handle_changepass(newpass: str = Form(...), name: str = Form(...), use
         raise HTTPException(
             status_code=500,
             detail=f"修改密码失败: {str(e)}"
-        )
+        ) from e
     return {"code": 200, "message":"OK"}
 
 @router.post("/reset_pass")
@@ -390,7 +390,7 @@ async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Sess
         raise HTTPException(
             status_code=500,
             detail=f"重置密码失败: {str(e)}"
-        )
+        ) from e
     
     reset_list = []
     times = 0
@@ -409,7 +409,7 @@ async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Sess
                 raise HTTPException(
                     status_code=500,
                     detail=f"读取重置记录文件失败: {str(e)}"
-                )
+                ) from e
         
         # 安全解析文件内容
         parsed_list = []
@@ -454,14 +454,14 @@ async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Sess
             raise HTTPException(
                 status_code=500,
                 detail=f"写入重置记录文件失败: {str(e)}"
-            )
+            ) from e
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"处理重置密码请求失败: {str(e)}"
-        )
+        ) from e
     
     return {"code": 200, "times": times}
 
@@ -478,7 +478,7 @@ async def reset_list():
             raise HTTPException(
                 status_code=500,
                 detail=f"读取重置记录文件失败: {str(e)}"
-            )
+            ) from e
     
     # 安全解析文件内容
     parsed_list = []
@@ -507,7 +507,7 @@ async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Se
             raise HTTPException(
                 status_code=500,
                 detail=f"读取重置记录文件失败: {str(e)}"
-            )
+            ) from e
     
     # 安全解析文件内容
     parsed_list = []
@@ -555,7 +555,7 @@ async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Se
                     raise HTTPException(
                         status_code=500,
                         detail=f"重置密码失败: {str(e)}"
-                    )
+                    ) from e
             else:
                 raise HTTPException(
                     status_code=400,
@@ -571,14 +571,14 @@ async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Se
             raise HTTPException(
                 status_code=500,
                 detail=f"写入重置记录文件失败: {str(e)}"
-            )
+            ) from e
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"处理重置密码请求失败: {str(e)}"
-        )
+        ) from e
     
     return {"code": 200, "message":"OK"}
 
@@ -641,7 +641,7 @@ async def save_profile(request: Request, user: TokenModel = Depends(check_jwt_to
         raise HTTPException(
             status_code=500,
             detail=f"保存文件失败: {str(e)}"
-        )
+        ) from e
 
 @router.get("/get_profile/{user_id}", dependencies=[Depends(check_jwt_token)])
 async def get_profile(*, user_id: int, user: TokenModel = Depends(check_jwt_token), db: Session = Depends(get_db)):
@@ -711,7 +711,7 @@ async def delete_profile(filename: str = Form(...), user: TokenModel = Depends(c
         raise HTTPException(
             status_code=500,
             detail=f"删除文件失败: {str(e)}"
-        )
+        ) from e
 
 @router.post("/submit_profile")
 async def submit_profile(info: str = Form(...), 
@@ -719,11 +719,11 @@ async def submit_profile(info: str = Form(...),
                 db: Session = Depends(get_db)):
     try:
         userinfo = json.loads(info)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=400,
             detail="无效的JSON格式"
-        )
+        ) from e
     
     useritem = db.query(Users).filter_by(id=user.id).first()
     if not useritem:
@@ -744,7 +744,7 @@ async def submit_profile(info: str = Form(...),
         raise HTTPException(
             status_code=500,
             detail=f"更新资料失败: {str(e)}"
-        )
+        ) from e
     return {"code": 200, "message":"OK"}
 
 
