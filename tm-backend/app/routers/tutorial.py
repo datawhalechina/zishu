@@ -117,7 +117,7 @@ def read_tutorial_file(file_path: str) -> str:
         with open(full_path, 'r', encoding='utf-8') as f:
             return f.read()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"读取文件失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"读取文件失败: {str(e)}") from e
 
 
 @router.get("/courses")

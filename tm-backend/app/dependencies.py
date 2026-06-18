@@ -57,7 +57,7 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
         # 通过解析得到的username,获取用户信息,并返回
         # return users_db.get(username)
         return db.query(users.Users).filter(users.Users.id== int(id)).first()
-    except (JWTError, ValidationError):
+    except (JWTError, ValidationError) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
@@ -65,7 +65,7 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
                 'message': "Token Error",
                 'data': "Token Error",
             }
-        )
+        ) from e
 
 
 def require_admin(user: users.Users = Depends(check_jwt_token)):
