@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchCoursesAPI } from '../request/tutorial/api'
 import { ElMessage } from 'element-plus'
@@ -29,6 +29,20 @@ const router = useRouter()
 const loading = ref(false)
 const courses = ref<Course[]>([])
 const expandedCourses = ref<Set<string>>(new Set())
+const searchKeyword = ref('')
+
+const filteredCourses = computed(() => {
+  if (!searchKeyword.value.trim()) return courses.value
+  const keyword = searchKeyword.value.trim().toLowerCase()
+  return courses.value.filter(course => {
+    const courseMatch = course.name.toLowerCase().includes(keyword)
+    const chapterMatch = course.chapters.some(ch =>
+      ch.name.toLowerCase().includes(keyword) ||
+      ch.lessons.some(l => l.title.toLowerCase().includes(keyword))
+    )
+    return courseMatch || chapterMatch
+  })
+})
 
 const getCourseIcon = (name: string) => {
   const nameLower = name.toLowerCase()
@@ -143,13 +157,22 @@ onMounted(fetchCourses)
         </div>
       </template>
 
-      <div v-if="courses.length === 0 && !loading" class="empty-tip">
-        <el-empty description="暂无课程" />
+      <div v-if="courses.length > 0" class="search-bar">
+        <el-input
+          v-model="searchKeyword"
+          placeholder="搜索课程、章节或课时..."
+          clearable
+          prefix-icon="Search"
+        />
+      </div>
+
+      <div v-if="filteredCourses.length === 0 && !loading" class="empty-tip">
+        <el-empty :description="searchKeyword ? '未找到匹配的课程' : '暂无课程'" />
       </div>
 
       <div v-else class="course-tree">
         <div
-          v-for="course in courses"
+          v-for="course in filteredCourses"
           :key="course.path"
           class="course-node"
         >
@@ -220,7 +243,8 @@ import {
   Connection, ElementPlus, Excel, Document, DocumentCopy,
   Platform, MagicStick, Reading, Clock, FolderOpened,
   DocumentChecked, Brush, Code, Presentation, Timer,
-  Opportunity, FolderZipped, Mouse, Collection, ArrowRight
+  Opportunity, FolderZipped, Mouse, Collection, ArrowRight,
+  Search
 } from '@element-plus/icons-vue'
 </script>
 
@@ -242,6 +266,10 @@ import {
 .header-title {
   font-size: 18px;
   font-weight: 600;
+}
+
+.search-bar {
+  margin-bottom: 16px;
 }
 
 .empty-tip {
