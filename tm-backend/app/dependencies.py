@@ -47,7 +47,7 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
     :return: 返回用户信息
     """
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         id: str = payload.get("sub")
         # 得到令牌过期时间
         expiration_timestamp = payload.get("exp")
