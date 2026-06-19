@@ -135,12 +135,18 @@ const loadLesson = async (path: string, title: string, chapter: string) => {
   }
 }
 
+// 页面原始标题，用于离开时恢复
+const originalTitle = '学习'
+
 // 开始学习计时
 const startTimer = () => {
   stopTimer()
   studyTimer.value = 0
   timerInterval.value = window.setInterval(() => {
     studyTimer.value++
+    // 在浏览器标签页实时显示学习时长
+    const title = currentTitle.value || '学习'
+    document.title = `${formatTime(studyTimer.value)} - ${title}`
   }, 1000)
 }
 
@@ -149,6 +155,8 @@ const stopTimer = () => {
   if (timerInterval.value) {
     clearInterval(timerInterval.value)
     timerInterval.value = null
+    // 恢复原始标题
+    document.title = currentTitle.value || originalTitle
   }
 }
 
