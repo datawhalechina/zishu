@@ -264,22 +264,32 @@ async def get_growth_trend(
     """获取用户增长趋势"""
     from app.core.models.users import Users
     from datetime import datetime, timedelta
-    from sqlalchemy import cast, Date
+    from sqlalchemy import func, cast, Date
 
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)
 
-    # 按天统计注册用户数
+    # 按天统计注册用户数（单次查询）
+    results = db.query(
+        func.date(Users.register_time).label('register_date'),
+        func.count().label('count')
+    ).filter(
+        Users.register_time >= start_date
+    ).group_by(
+        func.date(Users.register_time)
+    ).all()
+
+    # 转为字典便于查找
+    count_map = {str(row.register_date): row.count for row in results}
+
+    # 补全日期范围内的每一天
     daily_stats = []
     current = start_date
     while current <= end_date:
         date_str = current.strftime("%Y-%m-%d")
-        count = db.query(Users).filter(
-            cast(Users.register_time, Date) == current.date()
-        ).count()
         daily_stats.append({
             "date": date_str,
-            "count": count
+            "count": count_map.get(date_str, 0)
         })
         current += timedelta(days=1)
 
