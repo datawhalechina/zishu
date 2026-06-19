@@ -173,7 +173,7 @@ e = math.e
                 'stderr': f'执行超时（{timeout}秒）',
                 'exitCode': -1
             }
-        except Exception as e:
+        except Exception:
             # Docker 不可用，回退到 subprocess 方式（注意：full_code 已在上面构造）
             return self._execute_with_subprocess(code, timeout)
 
