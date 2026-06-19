@@ -40,9 +40,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=15)
     # 添加失效时间
     to_encode.update({"exp": expire})
     # SECRET_KEY：密钥
@@ -117,7 +117,7 @@ def generate_password_reset_token(user_id: int) -> str:
     """
     生成密码重置token
     """
-    expires = datetime.now() + timedelta(hours=24)
+    expires = datetime.utcnow() + timedelta(hours=24)
     to_encode = {"exp": expires, "user_id": user_id}
     return create_access_token(data=to_encode)
 
