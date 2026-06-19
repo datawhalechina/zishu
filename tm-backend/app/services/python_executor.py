@@ -57,8 +57,6 @@ e = math.e
         r'\bfrom\s+os\s+import',       # from os import
         r'\bimport\s+subprocess\b',    # import subprocess
         r'\bfrom\s+subprocess\s+import',  # from subprocess import
-        r'\bimport\s+sys\b',           # import sys
-        r'\bfrom\s+sys\s+import',      # from sys import
         r'\b__import__\s*\(',          # __import__()
         r'\beval\s*\(',                # eval()
         r'\bexec\s*\(',                # exec()
