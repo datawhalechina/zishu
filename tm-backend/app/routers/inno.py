@@ -1,11 +1,9 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
-from datetime import datetime, timedelta
-from app.dependencies import check_jwt_token, get_db
-from sqlalchemy.orm import Session
-from app.core.schemas.users import UserBase
-from app.core.models.users import Users, Base
+from fastapi import APIRouter, Request
+from app.core.models.users import Base
 from app.database import engine
-import json, os, ast
+import json
+import os
+import ast
 import logging
 
 logger = logging.getLogger(__name__)
