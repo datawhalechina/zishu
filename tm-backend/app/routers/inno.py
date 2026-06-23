@@ -11,8 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-Base.metadata.create_all(bind=engine)
-
 inno = APIRouter(
     prefix="/api/inno",
     tags=["inno"],

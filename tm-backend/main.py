@@ -13,6 +13,11 @@ from app.routers import code_execution
 from app.routers import config
 
 from app.config import settings
+from app.core.models.users import Base
+from app.database import engine
+
+# 初始化数据库表结构
+Base.metadata.create_all(bind=engine)
 
 # 配置日志格式
 logging.basicConfig(
