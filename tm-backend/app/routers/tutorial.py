@@ -1,6 +1,8 @@
 import os
+import time
 import glob
 from datetime import datetime
+from functools import lru_cache
 from fastapi import APIRouter, HTTPException, Form
 from pydantic import BaseModel
 from typing import List, Optional
@@ -14,6 +16,11 @@ current_dir = os.path.dirname(os.path.abspath(__file__))  # .../tm-backend/app/r
 for _ in range(3):
     current_dir = os.path.dirname(current_dir)
 TUTORIAL_BASE_DIR = os.path.join(current_dir, "tutorial")
+
+# 教程结构缓存（5分钟有效期）
+_cached_courses = None
+_cache_timestamp = 0.0
+_CACHE_TTL = 300  # 缓存有效期：5分钟
 
 
 class TutorialFile(BaseModel):
@@ -33,7 +40,13 @@ class CourseInfo(BaseModel):
 
 
 def parse_tutorial_structure():
-    """解析教程目录结构"""
+    """解析教程目录结构（带5分钟缓存）"""
+    global _cached_courses, _cache_timestamp
+
+    now = time.time()
+    if _cached_courses is not None and (now - _cache_timestamp) < _CACHE_TTL:
+        return _cached_courses
+
     courses = []
 
     if not os.path.exists(TUTORIAL_BASE_DIR):
@@ -100,6 +113,8 @@ def parse_tutorial_structure():
                 'chapters': list(chapters.values())
             })
 
+    _cached_courses = courses
+    _cache_timestamp = time.time()
     return courses
 
 
