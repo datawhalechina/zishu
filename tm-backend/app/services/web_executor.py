@@ -3,6 +3,7 @@ Web 代码执行器
 处理 HTML, CSS, JavaScript, Vue 代码的预览生成
 """
 from typing import Dict, Any
+import re
 
 
 class WebExecutor:
@@ -272,8 +273,6 @@ class WebExecutor:
 
     def _clean_typescript(self, code: str) -> str:
         """移除 TypeScript 类型注解"""
-        import re
-
         # 移除类型注解 : Type
         # 匹配 : 后面的类型，但不匹配 : 的情况（如对象中的键值对）
         # 这是个简化版本，处理常见情况
@@ -310,8 +309,6 @@ class WebExecutor:
 
     def _clean_imports(self, code: str) -> str:
         """移除或转换 ES6 import 语句"""
-        import re
-
         lines = code.split('\n')
         cleaned_lines = []
 
@@ -332,8 +329,6 @@ class WebExecutor:
 
     def _process_setup_script(self, script_code: str, template: str) -> str:
         """处理 <script setup> 格式的代码"""
-        import re
-
         # 1. 移除 ES6 imports
         script_code = self._clean_imports(script_code)
 
@@ -396,8 +391,6 @@ app.mount('#app');
 
     def _wrap_vue(self, code: str) -> str:
         """包装 Vue 代码 - 支持 SFC 格式和普通 JS 格式"""
-        import re
-
         # 检查是否是 SFC 格式（包含 <template> 标签）
         has_template = '<template' in code
         has_script = '<script' in code
