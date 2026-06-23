@@ -107,7 +107,8 @@ def read_tutorial_file(file_path: str) -> str:
     """读取教程文件内容"""
     full_path = os.path.realpath(os.path.join(TUTORIAL_BASE_DIR, file_path))
 
-    if not full_path.startswith(os.path.realpath(TUTORIAL_BASE_DIR)):
+    base_dir = os.path.realpath(TUTORIAL_BASE_DIR)
+    if os.path.commonpath([base_dir, full_path]) != base_dir:
         raise HTTPException(status_code=400, detail="无效的文件路径")
 
     if not os.path.exists(full_path):
