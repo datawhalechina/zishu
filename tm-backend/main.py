@@ -11,6 +11,7 @@ from app.routers import tutorial
 from app.routers import statistics
 from app.routers import code_execution
 from app.routers import config
+from app.routers import health
 
 from app.config import settings
 
@@ -45,6 +46,7 @@ app.include_router(tutorial.router, prefix="/api/tutorial")
 app.include_router(statistics.router)
 app.include_router(code_execution.router, prefix="/api/code")
 app.include_router(config.router)
+app.include_router(health.router)
 
 @app.get("/")
 def read_root():
