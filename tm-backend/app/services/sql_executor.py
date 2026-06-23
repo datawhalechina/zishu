@@ -3,7 +3,6 @@ SQL 代码执行器
 使用 SQLite 内存数据库执行 SQL 查询
 """
 import sqlite3
-import re
 from typing import Dict, Any, List, Tuple
 
 

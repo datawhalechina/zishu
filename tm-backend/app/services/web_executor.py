@@ -214,7 +214,6 @@ class WebExecutor:
         # 检查是否包含 Vue SFC 的特征标签
         has_template = '<template' in code_stripped
         has_script = '<script' in code_stripped
-        has_style = '<style' in code_stripped
         # 如果包含 template 和 script，很可能是 Vue SFC
         # 或者包含 script setup，也是 Vue SFC
         has_script_setup = '<script' in code_stripped and 'setup' in code_stripped
@@ -332,7 +331,6 @@ class WebExecutor:
 
     def _process_setup_script(self, script_code: str, template: str) -> str:
         """处理 <script setup> 格式的代码"""
-        import re
 
         # 1. 移除 ES6 imports
         script_code = self._clean_imports(script_code)
