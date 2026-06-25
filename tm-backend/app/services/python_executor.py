@@ -84,8 +84,6 @@ e = math.e
         Returns:
             (is_safe, error_message)
         """
-        code_lower = code.lower()
-
         # 检查禁止的模式
         for pattern in self.FORBIDDEN_PATTERNS:
             if re.search(pattern, code, re.IGNORECASE):
