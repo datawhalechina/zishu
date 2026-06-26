@@ -49,13 +49,7 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         id: str = payload.get("sub")
-        # 得到令牌过期时间
-        expiration_timestamp = payload.get("exp")
-        # 把令牌过期时间转化为人类可读时间信息
-        # expiration_time = datetime.fromtimestamp(expiration_timestamp)
-        # print(expiration_time)
         # 通过解析得到的username,获取用户信息,并返回
-        # return users_db.get(username)
         return db.query(users.Users).filter(users.Users.id== int(id)).first()
     except (JWTError, ValidationError):
         raise HTTPException(

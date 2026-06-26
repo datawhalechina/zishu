@@ -105,11 +105,6 @@ async def get_personal_trend(
         })
         current += timedelta(days=1)
 
-    # 从数据库获取学习记录
-    records = db.query(Users).filter(
-        Users.id == user.id
-    ).first()
-
     # 返回模拟数据（实际项目中应该从study_time表获取）
     # 这里返回最近7天的模拟数据
     import random
@@ -584,7 +579,6 @@ async def get_study_calendar(
     # 按日期统计学习时长
     daily_data = {}
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=days)
 
     for task in finished_tasks:
         if len(task) > 8:
