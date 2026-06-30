@@ -6,9 +6,12 @@ import asyncio
 import re
 import sys
 import platform
+import logging
 from typing import Dict, Any
 import subprocess
 import shlex
+
+logger = logging.getLogger(__name__)
 
 
 class PythonExecutor:
@@ -174,8 +177,9 @@ e = math.e
                 'exitCode': -1
             }
         except Exception as e:
-            # Docker 不可用，回退到 subprocess 方式（注意：full_code 已在上面构造）
-            return self._execute_with_subprocess(code, timeout)
+            # Docker 不可用，回退到 subprocess 方式（需要使用 full_code，保留预导入模块）
+            logger.warning("Docker 不可用，回退到 subprocess: %s", e)
+            return self._execute_with_subprocess(full_code, timeout)
 
     def _execute_with_subprocess(self, code: str, timeout: int) -> Dict[str, Any]:
         """
