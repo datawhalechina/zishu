@@ -20,6 +20,21 @@ inno = APIRouter(
 )
 
 
+def _safe_literal_eval_lines(lines):
+    """对文件行序列执行 ast.literal_eval，遇到无法解析的行跳过并记录日志"""
+    result = []
+    for line in lines:
+        line = line.strip() if isinstance(line, str) else line
+        if not line:
+            continue
+        try:
+            result.append(ast.literal_eval(line))
+        except (ValueError, SyntaxError):
+            logger.warning("跳过无法解析的行: %r", line[:80])
+            continue
+    return result
+
+
 @inno.get('/get_tm/{user_id}')
 async def get_tm(user_id:int):
     userid = str(user_id)
@@ -28,11 +43,11 @@ async def get_tm(user_id:int):
     if os.path.exists(f"static/tm/t{userid}.txt"):
         with open(f"static/tm/t{userid}.txt", "r", encoding="utf-8") as f:
             pr=f.readlines()
-    pr = [ast.literal_eval(x) for x in pr]
+    pr = _safe_literal_eval_lines(pr)
     if os.path.exists(f"static/tm/f{userid}.txt"):
         with open(f"static/tm/f{userid}.txt", "r", encoding="utf-8") as f:
             fn=f.readlines()
-    fn = [ast.literal_eval(x) for x in fn]
+    fn = _safe_literal_eval_lines(fn)
     fn.reverse()
     return {"pr":pr, "fn":fn}
 
@@ -43,7 +58,7 @@ async def get_pr(user_id:int):
     if os.path.exists(f"static/tm/t{userid}.txt"):
         with open(f"static/tm/t{userid}.txt", "r", encoding="utf-8") as f:
             pr=f.readlines()
-    pr = [ast.literal_eval(x) for x in pr]
+    pr = _safe_literal_eval_lines(pr)
     return pr
 
 @inno.put('/save_pr/{user_id}')
