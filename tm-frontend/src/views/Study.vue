@@ -288,9 +288,20 @@ const submitReport = async () => {
 
 // 页面离开时自动申报
 const beforeUnload = () => {
-  if (studyTimer.value > 60) {
-    // 实际项目中这里可以发送请求
-    console.log('学习时长:', studyTimer.value)
+  if (studyTimer.value > 60 && course.value) {
+    const userId = Number(loginstate.id)
+    if (!userId) return
+
+    const minutes = Math.ceil(studyTimer.value / 60)
+
+    // 使用 navigator.sendBeacon 确保请求在页面卸载时仍能发出
+    // 后端 report-study-time 接收表单数据，使用 FormData 编码
+    const formData = new FormData()
+    formData.append('user_id', String(userId))
+    formData.append('course_name', course.value.name)
+    formData.append('lesson_title', currentTitle.value)
+    formData.append('duration', String(minutes))
+    navigator.sendBeacon('/api/tutorial/report-study-time', formData)
   }
 }
 
