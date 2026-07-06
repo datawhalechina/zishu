@@ -49,6 +49,11 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         id: str = payload.get("sub")
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={'code': 5000, 'message': "Token Error", 'data': "Token Error"},
+            )
         # 得到令牌过期时间
         expiration_timestamp = payload.get("exp")
         # 把令牌过期时间转化为人类可读时间信息
