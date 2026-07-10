@@ -53,7 +53,10 @@ async def save_pr(request: Request, user_id:int):
     # 尝试多种参数格式
     taskinfo_str = form_data.get("params[taskinfo]") or form_data.get("taskinfo") or form_data.get("params")
     if taskinfo_str:
-        tasklist = json.loads(taskinfo_str)
+        try:
+            tasklist = json.loads(taskinfo_str)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="无效的JSON格式")
         with open(f"static/tm/t{userid}.txt", "w", encoding="utf-8") as f:
             for line in tasklist:
                 f.write(str(line) + "\n")
@@ -66,7 +69,10 @@ async def finish_tm(request: Request, user_id:int):
     # 尝试多种参数格式
     finishitem_str = form_data.get("params[finishitem]") or form_data.get("finishitem") or form_data.get("params")
     if finishitem_str:
-        finishitem = json.loads(finishitem_str)
+        try:
+            finishitem = json.loads(finishitem_str)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="无效的JSON格式")
         finishitem.reverse()
         with open(f"static/tm/f{userid}.txt", "a", encoding="utf-8") as f:
             for line in finishitem:
