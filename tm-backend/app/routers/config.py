@@ -77,7 +77,7 @@ async def save_configs(
         }
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"保存失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"保存失败: {str(e)}") from e
 
 
 @router.get("/check-inactive")
