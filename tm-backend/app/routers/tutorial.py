@@ -1,9 +1,11 @@
 import os
 import glob
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Form
+from fastapi import APIRouter, HTTPException, Form, Depends
 from pydantic import BaseModel
 from typing import List, Optional
+from app.dependencies import check_jwt_token
+from app.core.schemas.users import TokenModel
 
 router = APIRouter()
 
@@ -157,9 +159,15 @@ async def report_study_time(
     user_id: int = Form(...),
     course_name: str = Form(...),
     lesson_title: str = Form(...),
-    duration: int = Form(...)
+    duration: int = Form(...),
+    user: TokenModel = Depends(check_jwt_token),
 ):
     """申报学习时间，同步到时间管理"""
+    if user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="无权为其他用户申报学习时长",
+        )
     # 生成时间记录
     now = datetime.now()
     date_string = now.strftime("%Y/%m/%d")
@@ -204,9 +212,15 @@ async def sync_study_time(
     course_name: str = Form(...),
     lesson_title: str = Form(...),
     duration: int = Form(...),
-    date: str = Form(...)
+    date: str = Form(...),
+    user: TokenModel = Depends(check_jwt_token),
 ):
     """同步学习时间到时间管理系统"""
+    if user.id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="无权为其他用户同步学习时长",
+        )
     return {
         "code": 200,
         "message": "同步成功",
