@@ -365,7 +365,9 @@ async def handle_changepass(newpass: str = Form(...), name: str = Form(...), use
     return {"code": 200, "message":"OK"}
 
 @router.post("/reset_pass")
-async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db), user: TokenModel = Depends(require_admin)):
+    # 安全修复: 此前 /reset_pass 完全无鉴权，仅需 phone 与 password 即可重置任意账户密码，
+    # 属于账户接管级别漏洞。此端点仅供管理员使用，强制 require_admin 校验。
     # 验证密码强度
     is_valid, error_msg = validate_password_strength(password)
     if not is_valid:
@@ -373,7 +375,7 @@ async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Sess
             status_code=400,
             detail=error_msg
         )
-    
+
     useritem = db.query(Users).filter_by(phone=phone).first()
     if not useritem:
         raise HTTPException(
