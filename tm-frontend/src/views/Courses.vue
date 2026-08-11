@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchCoursesAPI } from '../request/tutorial/api'
 import { ElMessage } from 'element-plus'
@@ -29,6 +29,30 @@ const router = useRouter()
 const loading = ref(false)
 const courses = ref<Course[]>([])
 const expandedCourses = ref<Set<string>>(new Set())
+const EXPANDED_COURSES_KEY = 'courses-expanded-state'
+
+// 从 localStorage 恢复用户已展开的课程
+try {
+  const stored = localStorage.getItem(EXPANDED_COURSES_KEY)
+  if (stored) {
+    const parsed = JSON.parse(stored)
+    if (Array.isArray(parsed)) {
+      expandedCourses.value = new Set(parsed.filter((v): v is string => typeof v === 'string'))
+    }
+  }
+} catch (e) {
+  // localStorage 可能不可用或数据损坏，忽略并使用空集合
+  console.error('恢复已展开课程状态失败:', e)
+}
+
+// 监听变化并持久化到 localStorage
+watch(expandedCourses, (newSet) => {
+  try {
+    localStorage.setItem(EXPANDED_COURSES_KEY, JSON.stringify(Array.from(newSet)))
+  } catch (e) {
+    console.error('保存已展开课程状态失败:', e)
+  }
+}, { deep: true })
 
 const getCourseIcon = (name: string) => {
   const nameLower = name.toLowerCase()
@@ -90,8 +114,10 @@ const fetchCourses = async () => {
     const res = await fetchCoursesAPI()
     if (res.code === 200) {
       courses.value = res.data
-      // 默认展开前2个课程
-      courses.value.slice(0, 2).forEach(c => expandedCourses.value.add(c.path))
+      // 仅当用户没有任何已展开记录时，默认展开前2个课程
+      if (expandedCourses.value.size === 0) {
+        courses.value.slice(0, 2).forEach(c => expandedCourses.value.add(c.path))
+      }
     }
   } catch (error) {
     ElMessage.error('获取课程列表失败')
