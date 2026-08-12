@@ -68,6 +68,30 @@ const timerInterval = ref<number | null>(null)
 const showReportDialog = ref(false)
 const reportDuration = ref(30)
 const completedLessons = ref<Set<string>>(new Set())
+const COMPLETED_LESSONS_KEY = 'study-completed-lessons'
+
+// 从 localStorage 恢复已完成的课时记录
+try {
+  const stored = localStorage.getItem(COMPLETED_LESSONS_KEY)
+  if (stored) {
+    const parsed = JSON.parse(stored)
+    if (Array.isArray(parsed)) {
+      completedLessons.value = new Set(parsed.filter((v): v is string => typeof v === 'string'))
+    }
+  }
+} catch (e) {
+  // localStorage 可能不可用或数据损坏，忽略并使用空集合
+  console.warn('恢复已完成课时记录失败:', e)
+}
+
+// 监听变化并持久化到 localStorage
+watch(completedLessons, (newSet) => {
+  try {
+    localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(Array.from(newSet)))
+  } catch (e) {
+    console.warn('保存已完成课时记录失败:', e)
+  }
+}, { deep: true })
 
 // 代码块数据接口
 interface CodeBlockData {
