@@ -69,6 +69,9 @@ const showReportDialog = ref(false)
 const reportDuration = ref(30)
 const completedLessons = ref<Set<string>>(new Set())
 
+// 上次打开课时位置持久化键
+const LAST_LESSON_KEY = 'study-last-lesson'
+
 // 代码块数据接口
 interface CodeBlockData {
   id: string
@@ -93,7 +96,7 @@ const fetchCourse = async () => {
     if (res.code === 200) {
       course.value = res.data
 
-      // 如果有指定章节，跳转到章节第一课
+      // 如果有指定章节，跳转到章节第一课；否则恢复上次打开的课时
       const chapterName = route.query.chapter as string
       if (chapterName) {
         currentChapter.value = chapterName
@@ -102,6 +105,17 @@ const fetchCourse = async () => {
           const firstLesson = chapter.lessons[0]
           loadLesson(firstLesson.path, firstLesson.title, chapter.name)
         }
+      } else {
+        // 尝试恢复上次在该课程中的阅读位置
+        try {
+          const raw = localStorage.getItem(LAST_LESSON_KEY)
+          if (raw) {
+            const saved = JSON.parse(raw)
+            if (saved && saved.course === courseName && saved.path) {
+              loadLesson(saved.path, saved.title || '', saved.chapter || '')
+            }
+          }
+        } catch (e) { /* 静默降级到默认空状态 */ }
       }
     }
   } catch (error) {
@@ -151,6 +165,23 @@ const stopTimer = () => {
     timerInterval.value = null
   }
 }
+
+// 监听 currentPath 变化，自动保存当前课时位置到 localStorage
+watch(currentPath, (newPath) => {
+  try {
+    if (newPath) {
+      const courseName = route.query.course as string
+      localStorage.setItem(LAST_LESSON_KEY, JSON.stringify({
+        course: courseName,
+        path: newPath,
+        title: currentTitle.value,
+        chapter: currentChapter.value
+      }))
+    } else {
+      localStorage.removeItem(LAST_LESSON_KEY)
+    }
+  } catch (e) { /* 静默降级 */ }
+})
 
 // 格式化时间
 const formatTime = (seconds: number) => {
