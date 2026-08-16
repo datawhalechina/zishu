@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoginStore } from '../store'
-import { fetchCourseDetailAPI, fetchTutorialContentAPI, reportStudyTimeAPI, syncStudyTimeAPI } from '../request/tutorial/api'
+import { fetchCourseDetailAPI, fetchTutorialContentAPI, reportStudyTimeAPI } from '../request/tutorial/api'
 import { addStudyTimeAPI } from '../request/inno/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import hljs from 'highlight.js'
@@ -286,11 +286,50 @@ const submitReport = async () => {
   }
 }
 
-// 页面离开时自动申报
+// 页面离开时自动申报学习时长
 const beforeUnload = () => {
-  if (studyTimer.value > 60) {
-    // 实际项目中这里可以发送请求
-    console.log('学习时长:', studyTimer.value)
+  if (studyTimer.value <= 60) return
+  if (!loginstate.id || !course.value) return
+
+  const userId = Number(loginstate.id)
+  if (!userId) return
+
+  const now = new Date()
+  const dateString = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/')
+  const duration = Math.ceil(studyTimer.value / 60)
+
+  // 构建时间管理记录，字段顺序与手动提交保持一致
+  const taskinfo = [[
+    '',  // 编号
+    `学习-${course.value.name}`,  // 主题
+    duration,  // 目标用时
+    currentTitle.value,  // 分拆事项
+    duration,  // 计划用时
+    '',  // 开始时间
+    '',  // 结束时间
+    duration,  // 实际用时
+    dateString  // 日期
+  ]]
+
+  // 页面卸载时优先使用 sendBeacon，保证请求能被浏览器发出
+  // 退化为普通 fetch + keepalive
+  try {
+    const url = `${loginstate.iframeurl}/api/inno/add_study_time/${userId}`
+    const blob = new Blob([JSON.stringify({ taskinfo })], { type: 'application/json' })
+
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      navigator.sendBeacon(url, blob)
+    } else if (typeof fetch === 'function') {
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskinfo }),
+        keepalive: true
+      }).catch(() => { /* 静默失败，避免影响页面卸载 */ })
+    }
+  } catch (e) {
+    // 自动保存失败不能影响页面正常卸载
+    if (typeof console !== 'undefined') console.warn('自动保存学习时长失败:', e)
   }
 }
 
