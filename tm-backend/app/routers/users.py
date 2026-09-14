@@ -495,7 +495,7 @@ async def reset_list():
     return parsed_list
 
 @router.post("/handle_reset_pass")
-async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Session = Depends(get_db)):
+async def handle_reset_pass(action: str = Form(...), id: int = Form(...), user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     reset_file_path = "static/am/reset_pass.txt"
     reset_list = []
     
