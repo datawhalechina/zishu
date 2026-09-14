@@ -832,7 +832,7 @@ async def fetch_shuzhi(userid: int):
 
 
 @router.post("/add_shuzhi")
-async def add_shuzhi(request: Request, db: Session = Depends(get_db)):
+async def add_shuzhi(request: Request, user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     """添加塾值记录"""
     try:
         data = await request.json()
